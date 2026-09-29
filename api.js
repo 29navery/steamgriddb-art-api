@@ -14,7 +14,6 @@ export default {
     const SGDB_API_KEY = env.SGDB_API_KEY;
 
     try {
-      // 1. Search for game ID on SteamGridDB
       const searchRes = await fetch(`https://www.steamgriddb.com/api/v2/search/autocomplete/${encodeURIComponent(gameName)}`, {
         headers: { 'Authorization': `Bearer ${SGDB_API_KEY}` }
       });
