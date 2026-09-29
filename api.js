@@ -2,6 +2,7 @@ export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
     
+    // Supports both ?name= or ?game_query=
     const gameName = url.searchParams.get('name') || url.searchParams.get('game_query');
 
     if (!gameName) {
@@ -11,9 +12,10 @@ export default {
       });
     }
 
-    const SGDB_API_KEY = env.SGDB_API_KEY;
+    const SGDB_API_KEY = env.SGDB_API_KEY; // Stored securely in Cloudflare Environment Variables
 
     try {
+      // 1. Search for game ID on SteamGridDB
       const searchRes = await fetch(`https://www.steamgriddb.com/api/v2/search/autocomplete/${encodeURIComponent(gameName)}`, {
         headers: { 'Authorization': `Bearer ${SGDB_API_KEY}` }
       });
@@ -27,6 +29,7 @@ export default {
       
       const gameId = searchData.data[0].id;
 
+      // 2. Fetch grids, heroes, and logos concurrently
       const [gridsRes, heroesRes, logosRes] = await Promise.all([
         fetch(`https://www.steamgriddb.com/api/v2/grids/game/${gameId}?dimensions=600x900`, { headers: { 'Authorization': `Bearer ${SGDB_API_KEY}` } }),
         fetch(`https://www.steamgriddb.com/api/v2/heroes/game/${gameId}`, { headers: { 'Authorization': `Bearer ${SGDB_API_KEY}` } }),
@@ -45,11 +48,12 @@ export default {
         logo: logosData.data?.[0]?.url || null
       };
 
+      // Return JSON with CORS headers enabled so your app can call it freely
       return new Response(JSON.stringify(result), {
         headers: { 
           'Content-Type': 'application/json', 
           'Access-Control-Allow-Origin': '*',
-          'Cache-Control': 'public, max-age=86400'
+          'Cache-Control': 'public, max-age=86400' // Cache results on Cloudflare for 24 hours
         }
       });
 
