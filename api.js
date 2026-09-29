@@ -2,7 +2,6 @@ export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
     
-    // Supports both ?name= or ?game_query=
     const gameName = url.searchParams.get('name') || url.searchParams.get('game_query');
 
     if (!gameName) {
@@ -12,7 +11,7 @@ export default {
       });
     }
 
-    const SGDB_API_KEY = env.SGDB_API_KEY; // Stored securely in Cloudflare Environment Variables
+    const SGDB_API_KEY = env.SGDB_API_KEY;
 
     try {
       // 1. Search for game ID on SteamGridDB
@@ -48,12 +47,11 @@ export default {
         logo: logosData.data?.[0]?.url || null
       };
 
-      // Return JSON with CORS headers enabled so your app can call it freely
       return new Response(JSON.stringify(result), {
         headers: { 
           'Content-Type': 'application/json', 
           'Access-Control-Allow-Origin': '*',
-          'Cache-Control': 'public, max-age=86400' // Cache results on Cloudflare for 24 hours
+          'Cache-Control': 'public, max-age=86400'
         }
       });
 
