@@ -27,7 +27,6 @@ export default {
       
       const gameId = searchData.data[0].id;
 
-      // 2. Fetch grids, heroes, and logos concurrently
       const [gridsRes, heroesRes, logosRes] = await Promise.all([
         fetch(`https://www.steamgriddb.com/api/v2/grids/game/${gameId}?dimensions=600x900`, { headers: { 'Authorization': `Bearer ${SGDB_API_KEY}` } }),
         fetch(`https://www.steamgriddb.com/api/v2/heroes/game/${gameId}`, { headers: { 'Authorization': `Bearer ${SGDB_API_KEY}` } }),
